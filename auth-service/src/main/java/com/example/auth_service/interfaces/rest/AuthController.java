@@ -18,6 +18,7 @@ public class AuthController {
 
     public ResponseEntity<TokenResponse> loginWithPassword(@Valid @RequestBody PasswordLoginRequest request) {
         TokenResponse token = passwordLoginHandler.handle(request.email(), request.password());
+        
 
         return ResponseEntity.ok(token);
     }

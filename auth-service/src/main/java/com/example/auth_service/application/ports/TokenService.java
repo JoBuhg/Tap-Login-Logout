@@ -5,5 +5,5 @@ import com.example.auth_service.domain.user.User;
 public interface TokenService {
     TokenPair issue(User user);
 
-    record TokenPair(String token, String refreshToken, long expiresIn) {}
+    record TokenPair(String token, String refreshToken, long expiresIn, long refreshExpiresIn) {}
 }
