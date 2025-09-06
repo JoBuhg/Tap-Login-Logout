@@ -1,13 +1,18 @@
 package com.example.auth_service.domain.Refresh;
 
 import java.time.Instant;
-import java.util.Objects;
+import java.util.UUID;
+
+import com.example.auth_service.domain.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 /**
@@ -18,8 +23,8 @@ import jakarta.persistence.Table;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     // Valor do hash do token
     @Column(nullable = false, unique = true)
@@ -29,47 +34,38 @@ public class RefreshToken {
     @Column(nullable = false)
     private Instant expiresAt;
 
-    // ...getters, setters, construtores...
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    public RefreshToken() {}
+    @Column(nullable = false)
+    private boolean revoked = false;
 
-    public RefreshToken(String tokenHash, Instant expiresAt) {
+    // Construtor para facilitar a criação de novos tokens
+    public RefreshToken(String tokenHash, Instant expiresAt, User user) {
         this.tokenHash = tokenHash;
         this.expiresAt = expiresAt;
+        this.user = user;
+        this.revoked = false;
+    }
+   
+    public boolean isExpired() {
+        return Instant.now().isAfter(expiresAt);
     }
 
-    public Long getId() {
+    public boolean isActive() {
+        return !isExpired();
+    }
+
+    public void revoke() {
+        this.revoked = true;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public UUID getId() {
         return id;
-    }
-
-    public String getTokenHash() {
-        return tokenHash;
-    }
-
-    public void setTokenHash(String tokenHash) {
-        this.tokenHash = tokenHash;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(Instant expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RefreshToken)) return false;
-        RefreshToken that = (RefreshToken) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(tokenHash, that.tokenHash) &&
-                Objects.equals(expiresAt, that.expiresAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, tokenHash, expiresAt);
     }
 }

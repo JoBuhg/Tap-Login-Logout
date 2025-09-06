@@ -1,24 +1,21 @@
 package com.example.auth_service.domain.Refresh;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.util.Optional;
+import java.util.UUID;
 
 
 public interface RefreshTokenRepository {
-    RefreshToken refreshToken = new RefreshToken();
     // Salva um novo refresh token
     RefreshToken save(RefreshToken token);
 
     // Busca um refresh token ativo pelo hash
-    Optional<RefreshToken> findActiveByHash(String hash);
+    Optional<RefreshToken> findActiveByHash(String tokenHash);
 
-    // Revoga um refresh token pelo hash
-    void revoke(String hash);
+    // Revoga um refresh token pelo ID
+    void revoke(UUID tokenId);
 
     // Remove um refresh token pelo id
-    void deleteById(Long id);
+    void deleteById(UUID tokenId);
 
-
+    void revokeAllByUser(UUID Userid);
 }
